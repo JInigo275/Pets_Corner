@@ -65,7 +65,7 @@ export default function Services() {
       <p className="mb-4 text-sm text-muted-foreground">{service.description}</p>
       <div className="flex items-center justify-between">
         <span className="text-lg font-bold text-primary">
-          ${service.price_min.toFixed(0)} - ${service.price_max.toFixed(0)}
+          ₱{service.price_min.toFixed(0)} - ₱{service.price_max.toFixed(0)}
         </span>
         <Button size="sm" asChild>
           <Link to="/booking">Book Now</Link>

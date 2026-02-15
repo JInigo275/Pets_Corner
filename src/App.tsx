@@ -20,6 +20,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminAppointments from "./pages/admin/AdminAppointments";
 import AdminServices from "./pages/admin/AdminServices";
 import AdminCustomers from "./pages/admin/AdminCustomers";
+import AdminPets from "./pages/admin/AdminPets";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -46,6 +47,7 @@ const App = () => (
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/customers" element={<AdminCustomers />} />
             <Route path="/admin/appointments" element={<AdminAppointments />} />
+            <Route path="/admin/pets" element={<AdminPets />} />
             <Route path="/admin/services" element={<AdminServices />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

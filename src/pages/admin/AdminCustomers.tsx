@@ -31,7 +31,10 @@ import {
   CreditCard,
   ChevronLeft,
   Eye,
+  ShieldCheck,
+  ShieldOff,
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Pet {
   id: string;
@@ -72,6 +75,8 @@ export default function AdminCustomers() {
   const [serviceHistory, setServiceHistory] = useState<ServiceHistoryItem[]>([]);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [customerRoles, setCustomerRoles] = useState<Record<string, boolean>>({});
+  const [togglingAdmin, setTogglingAdmin] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -84,8 +89,49 @@ export default function AdminCustomers() {
       return;
     }
 
-    if (isAdmin) fetchCustomers();
+    if (isAdmin) {
+      fetchCustomers();
+      fetchAdminRoles();
+    }
   }, [user, isAdmin, authLoading, navigate]);
+
+  async function fetchAdminRoles() {
+    const { data } = await supabase
+      .from('user_roles')
+      .select('user_id, role')
+      .eq('role', 'admin');
+    
+    const roleMap: Record<string, boolean> = {};
+    data?.forEach(r => { roleMap[r.user_id] = true; });
+    setCustomerRoles(roleMap);
+  }
+
+  async function toggleAdminRole(customerId: string, currentlyAdmin: boolean) {
+    if (customerId === user?.id) {
+      toast.error("You can't remove your own admin role");
+      return;
+    }
+    setTogglingAdmin(customerId);
+
+    if (currentlyAdmin) {
+      const { error } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', customerId)
+        .eq('role', 'admin');
+      if (error) toast.error('Failed to remove admin role');
+      else toast.success('Admin role removed');
+    } else {
+      const { error } = await supabase
+        .from('user_roles')
+        .insert({ user_id: customerId, role: 'admin' as const });
+      if (error) toast.error('Failed to grant admin role');
+      else toast.success('Admin role granted');
+    }
+
+    await fetchAdminRoles();
+    setTogglingAdmin(null);
+  }
 
   async function fetchCustomers() {
     setIsLoading(true);
@@ -279,14 +325,31 @@ export default function AdminCustomers() {
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => viewCustomerDetails(customer)}
-                      >
-                        <Eye className="mr-1 h-4 w-4" />
-                        View Details
-                      </Button>
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant={customerRoles[customer.user_id] ? 'destructive' : 'outline'}
+                          size="sm"
+                          disabled={togglingAdmin === customer.user_id || customer.user_id === user?.id}
+                          onClick={() => toggleAdminRole(customer.user_id, !!customerRoles[customer.user_id])}
+                        >
+                          {togglingAdmin === customer.user_id ? (
+                            <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                          ) : customerRoles[customer.user_id] ? (
+                            <ShieldOff className="mr-1 h-4 w-4" />
+                          ) : (
+                            <ShieldCheck className="mr-1 h-4 w-4" />
+                          )}
+                          {customerRoles[customer.user_id] ? 'Remove Admin' : 'Make Admin'}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => viewCustomerDetails(customer)}
+                        >
+                          <Eye className="mr-1 h-4 w-4" />
+                          Details
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))

@@ -231,7 +231,7 @@ export default function Booking() {
                   <SelectValue placeholder="Any available groomer" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any available groomer</SelectItem>
+                  <SelectItem value="any">Any available groomer</SelectItem>
                   {groomers.map((groomer) => (
                     <SelectItem key={groomer.id} value={groomer.id}>
                       {groomer.name} {groomer.specialty && `- ${groomer.specialty}`}
