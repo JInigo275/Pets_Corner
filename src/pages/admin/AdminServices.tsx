@@ -189,7 +189,7 @@ export default function AdminServices() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Min Price ($) *</Label>
+                      <Label>Min Price (₱) *</Label>
                       <Input
                         type="number"
                         value={formData.price_min}
@@ -198,7 +198,7 @@ export default function AdminServices() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Max Price ($) *</Label>
+                      <Label>Max Price (₱) *</Label>
                       <Input
                         type="number"
                         value={formData.price_max}

@@ -211,7 +211,7 @@ CREATE POLICY "Admins can insert audit logs" ON public.admin_audit_log FOR INSER
 
 -- Insert default services
 INSERT INTO public.services (name, description, category, price_min, price_max, duration_minutes) VALUES
-('Basic Bath', 'Shampoo, conditioning, and blow dry', 'grooming', 25.00, 45.00, 30),
+('Basic Grooming', 'Shampoo, conditioning, and blow dry', 'grooming', 35.00, 65.00, 15),
 ('Full Grooming', 'Bath, haircut, nail trim, ear cleaning', 'grooming', 45.00, 85.00, 60),
 ('Nail Trim', 'Nail clipping and filing', 'grooming', 10.00, 20.00, 15),
 ('Teeth Cleaning', 'Professional dental cleaning', 'grooming', 30.00, 50.00, 30),

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { PawPrint, Mail, Phone, MapPin } from 'lucide-react';
+import { Facebook, Instagram, Phone, MapPin } from 'lucide-react';
+import Logo from '@/components/Logo.png';
 
 export function Footer() {
   return (
@@ -9,8 +10,12 @@ export function Footer() {
           {/* Brand */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                <PawPrint className="h-5 w-5" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary">
+                <img
+                  src={Logo}
+                  alt="Pets Corner Logo"
+                  className="h-6 w-6 object-contain"
+                />
               </div>
               Pets Corner
             </Link>
@@ -34,9 +39,8 @@ export function Footer() {
             <h4 className="mb-4 font-display font-semibold">Services</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>Pet Grooming</li>
-              <li>Day Boarding</li>
-              <li>Overnight Stay</li>
-              <li>Pick-up Service</li>
+              <li>Pet Boarding</li>
+              <li>Pet Supplies</li>
             </ul>
           </div>
 
@@ -44,18 +48,48 @@ export function Footer() {
           <div>
             <h4 className="mb-4 font-display font-semibold">Contact Us</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
+
+              <li className="flex items-center gap-2">
+                <Facebook className="h-4 w-4 text-primary" />
+                <a
+                  href="https://www.facebook.com/profile.php?id=61568090130383"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Petscorner
+                </a>
+              </li>
+
+              <li className="flex items-start gap-2">
+                <Instagram className="h-4 w-4 text-primary mt-0.5" />
+                <a
+                  href="https://www.instagram.com/petscorner.est2024"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground transition-colors"
+                >
+                  <span>@petscorner.est2024</span>
+                </a>
+
+              </li>
               <li className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-primary" />
-                (555) 123-4567
+                0968-237-2308 | (045) 887 6020
               </li>
-              <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-primary" />
-                hello@petscorner.com
-              </li>
+
               <li className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 text-primary mt-0.5" />
-                <span>123 Pet Street, Pawville, PC 12345</span>
+                <a
+                  href="https://maps.app.goo.gl/c6eRDGtiBdiymZ9p9"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground transition-colors"
+                >
+                  <span>192 Purok 2, San Jose, City of San Fernando, Pampanga</span>
+                </a>
               </li>
+
             </ul>
           </div>
         </div>

@@ -1,38 +1,39 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import Banner from '../components/Banner.png';
 import { Layout } from '@/components/layout/Layout';
-import { 
-  PawPrint, 
-  Scissors, 
-  Home, 
-  Calendar, 
-  Star, 
-  Shield, 
+import PawPrint from '..@/components/logo.ico';
+import {
+  Scissors,
+  Home,
+  Calendar,
+  Star,
+  Shield,
   Clock,
   Heart,
   Sparkles,
-  Truck
+  ShoppingBasket
 } from 'lucide-react';
 
 export default function Index() {
   const services = [
     {
       icon: Scissors,
-      title: 'Professional Grooming',
-      description: 'Full-service grooming including bath, haircut, nail trim, and ear cleaning.',
-      price: 'From 450'
+      title: 'Pet Grooming Services',
+      description: 'Offers basic and full grooming, with ear cleaning, teeth brushing, and other pampering services.',
+      price: 'Starts at 350'
     },
     {
       icon: Home,
-      title: 'Boarding Services',
-      description: 'Safe and comfortable overnight stays with 24/7 care and playtime.',
-      price: 'From 300/night'
+      title: 'Pet Boarding',
+      description: 'Includes comfortable accommodation, meals, and a free bath and dry for stays of 3 days or more.',
+      price: 'Starts at 400'
     },
     {
-      icon: Truck,
-      title: 'Pick-up Service',
-      description: 'Convenient pick-up and drop-off service right at your doorstep.',
-      price: 'From 300'
+      icon: ShoppingBasket,
+      title: 'Pet Supplies',
+      description: 'Provides quality pet supplies, from food and toys to grooming essentials.',
+      price: ''
     },
   ];
 
@@ -46,37 +47,35 @@ export default function Index() {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-secondary via-background to-secondary/50 py-20 md:py-32">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
-          <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-accent/10 blur-3xl" />
-        </div>
-        
+      <section className="relative overflow-hidden py-20 md:py-32">
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${Banner})` }}
+        />
+
         <div className="container relative">
           <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
-              <Sparkles className="h-4 w-4" />
-              Premium Pet Care Services
-            </div>
-            
-            <h1 className="mb-6 font-display text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
-              Where Every Pet Gets{' '}
-              <span className="gradient-text">Royal Treatment</span>
+
+            <h1 className="mb-6 font-display text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl" style={{ color: '#dabb7f' }}>
+              {'PETS CORNER'}
             </h1>
-            
-            <p className="mb-8 text-lg text-muted-foreground md:text-xl">
-              Professional grooming, cozy boarding, and love-filled care for your furry family members. 
-              Book your appointment today and give your pet the pampering they deserve.
+
+            <p className="mb-4 text-lg text-muted-foreground md:text-xl" style={{ color: '#fae5bb' }}>
+              At our shop, we treat your pets like our own — with grooming, boarding, and all the supplies they need to live happy and healthy lives.
             </p>
-            
+
+            <p className="mb-6 text-sm md:text-base italic" style={{ color: '#fae5bb' }}>
+              Premium food. Quality care. Loving hands.
+            </p>
+
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Button variant="hero" size="xl" asChild>
+              <Button variant="secondary" size="xl" asChild>
                 <Link to="/booking">
                   <Calendar className="mr-2 h-5 w-5" />
                   Book Appointment
                 </Link>
               </Button>
-              <Button variant="outline" size="xl" asChild>
+              <Button variant="accent" size="xl" asChild>
                 <Link to="/services">
                   View Services
                 </Link>
@@ -85,13 +84,6 @@ export default function Index() {
           </div>
         </div>
 
-        {/* Decorative paw prints */}
-        <div className="absolute bottom-10 left-10 opacity-10">
-          <PawPrint className="h-24 w-24 text-primary" />
-        </div>
-        <div className="absolute top-20 right-20 opacity-10">
-          <PawPrint className="h-16 w-16 text-accent" />
-        </div>
       </section>
 
       {/* Services Section */}
@@ -137,7 +129,8 @@ export default function Index() {
           <div className="mb-12 text-center">
             <h2 className="mb-4 font-display text-3xl font-bold md:text-4xl">Why Choose Pets Corner?</h2>
             <p className="mx-auto max-w-2xl text-muted-foreground">
-              We're not just a pet service — we're a family that cares about your furry friends as much as you do.
+              Professional grooming, cozy boarding, and love-filled care for your furry family members.
+              Book your appointment today and give your pet the pampering they deserve.
             </p>
           </div>
 
@@ -168,9 +161,9 @@ export default function Index() {
             Join our family of happy pet parents and experience the Pets Corner difference today.
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Button 
-              variant="secondary" 
-              size="xl" 
+            <Button
+              variant="secondary"
+              size="xl"
               className="shadow-lg"
               asChild
             >
@@ -178,8 +171,8 @@ export default function Index() {
                 Create Account
               </Link>
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="xl"
               className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
               asChild

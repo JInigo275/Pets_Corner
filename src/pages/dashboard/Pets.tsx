@@ -14,14 +14,14 @@ import { toast } from 'sonner';
 interface Pet {
   id: string;
   name: string;
-  species: 'dog' | 'cat' | 'bird' | 'rabbit' | 'other';
+  species: 'dog' | 'cat';
   breed: string | null;
   age: number | null;
   weight: number | null;
   notes: string | null;
 }
 
-const speciesOptions = ['dog', 'cat', 'bird', 'rabbit', 'other'] as const;
+const speciesOptions = ['dog', 'cat'] as const;
 
 export default function Pets() {
   const { user } = useAuth();
@@ -126,10 +126,7 @@ export default function Pets() {
   const speciesEmoji = (species: string) => {
     const emojis: Record<string, string> = {
       dog: '🐕',
-      cat: '🐱',
-      bird: '🐦',
-      rabbit: '🐰',
-      other: '🐾',
+      cat: '🐱'
     };
     return emojis[species] || '🐾';
   };
