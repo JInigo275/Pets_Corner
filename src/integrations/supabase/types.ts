@@ -363,7 +363,7 @@ export type Database = {
         | "in-progress"
         | "completed"
         | "cancelled"
-      pet_species: "dog" | "cat" | "bird" | "rabbit" | "other"
+      pet_species: "dog" | "cat" 
       service_type: "pick-up" | "home-service" | "walk-in"
     }
     CompositeTypes: {
@@ -500,7 +500,7 @@ export const Constants = {
         "completed",
         "cancelled",
       ],
-      pet_species: ["dog", "cat", "bird", "rabbit", "other"],
+      pet_species: ["dog", "cat"],
       service_type: ["pick-up", "home-service", "walk-in"],
     },
   },

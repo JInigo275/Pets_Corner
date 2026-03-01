@@ -101,7 +101,7 @@ export default function Dashboard() {
         {/* Welcome Header */}
         <div className="mb-8">
           <h1 className="mb-2 font-display text-3xl font-bold">
-            Welcome back, {profile?.full_name?.split(' ')[0] || 'there'}! 👋
+            Welcome back, {profile?.full_name?.split(' ')[0] || 'there'}! 
           </h1>
           <p className="text-muted-foreground">
             Here's an overview of your pet care activities

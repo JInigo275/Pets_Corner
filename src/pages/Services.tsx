@@ -91,7 +91,7 @@ export default function Services() {
         <div className="container text-center">
           <h1 className="mb-4 font-display text-4xl font-bold md:text-5xl">Our Services</h1>
           <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-            From professional grooming to comfortable boarding, we offer comprehensive care for your beloved pets.
+            From grooming to comfortable boarding, we offer comprehensive care for your beloved pets.
           </p>
         </div>
       </section>
@@ -142,8 +142,8 @@ export default function Services() {
                 </p>
               </div>
 
-              <div className="rounded-xl border border-primary/30 bg-primary/5 p-6 text-center">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <div className="rounded-xl border border-border bg-card p-6 text-center">
+                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-accent/10 text-accent">
                   <Home className="h-7 w-7" />
                 </div>
                 <h3 className="mb-2 font-display font-bold">Home Service</h3>
