@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["Nunito", "system-ui", "sans-serif"],
-        body: ["Poppins", "system-ui", "sans-serif"],
+        display: ["Cinzel", "serif"],
+        body: ["Lora", "serif"],
         cinzel: ["Cinzel", "serif"],
         lora: ["Lora", "serif"],
       },

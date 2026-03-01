@@ -41,7 +41,7 @@ export function Navbar() {
                   className="h-6 w-6 object-contain"
                 />
               </div>
-          <span className="hidden sm:inline">PetsCorner</span>
+          <span className="hidden sm:inline">Pets Corner</span>
         </Link>
 
         {/* Desktop Navigation */}
