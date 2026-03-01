@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Banner from '../components/Banner.png';
 import { Layout } from '@/components/layout/Layout';
-import PawPrint from '..@/components/logo.ico';
+
+
 import {
   Scissors,
   Home,
@@ -57,15 +58,15 @@ export default function Index() {
           <div className="mx-auto max-w-3xl text-center">
 
             <h1 className="mb-6 font-display text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl" style={{ color: '#dabb7f' }}>
-              {'PETS CORNER'}
+              <span className="font-cinzel">PETS CORNER</span>
             </h1>
 
             <p className="mb-4 text-lg text-muted-foreground md:text-xl" style={{ color: '#fae5bb' }}>
-              At our shop, we treat your pets like our own — with grooming, boarding, and all the supplies they need to live happy and healthy lives.
+              <span className='font-lora'>At our shop, we treat your pets like our own — with grooming, boarding, and all the supplies they need to live happy and healthy lives.</span>
             </p>
 
             <p className="mb-6 text-sm md:text-base italic" style={{ color: '#fae5bb' }}>
-              Premium food. Quality care. Loving hands.
+              <span className='font-lora'>Premium food. Quality care. Loving hands.</span>
             </p>
 
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">

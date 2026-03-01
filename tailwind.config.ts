@@ -16,6 +16,8 @@ export default {
       fontFamily: {
         display: ["Nunito", "system-ui", "sans-serif"],
         body: ["Poppins", "system-ui", "sans-serif"],
+        cinzel: ["Cinzel", "serif"],
+        lora: ["Lora", "serif"],
       },
       colors: {
         border: "hsl(var(--border))",

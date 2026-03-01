@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { PawPrint, Menu, LogOut, User, Calendar, LayoutDashboard } from 'lucide-react';
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import Logo from '@/components/Logo.png';
 
 export function Navbar() {
   const { user, profile, isAdmin, signOut } = useAuth();
@@ -33,10 +34,14 @@ export function Navbar() {
     <nav className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-lg">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            <PawPrint className="h-5 w-5" />
-          </div>
-          <span className="hidden sm:inline">PawCare</span>
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary">
+                <img
+                  src={Logo}
+                  alt="Pets Corner Logo"
+                  className="h-6 w-6 object-contain"
+                />
+              </div>
+          <span className="hidden sm:inline">PetsCorner</span>
         </Link>
 
         {/* Desktop Navigation */}
