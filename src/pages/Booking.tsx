@@ -84,7 +84,7 @@ export default function Booking() {
 
   const selectedServiceData = services.find(s => s.id === selectedService);
   const estimatedPrice = selectedServiceData
-    ? `$${selectedServiceData.price_min.toFixed(0)} - $${selectedServiceData.price_max.toFixed(0)}`
+    ? `P${selectedServiceData.price_min.toFixed(0)} - P${selectedServiceData.price_max.toFixed(0)}`
     : null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -173,7 +173,7 @@ export default function Booking() {
                 <SelectContent>
                   {services.map((service) => (
                     <SelectItem key={service.id} value={service.id}>
-                      {service.name} (${service.price_min} - ${service.price_max})
+                      {service.name} (P{service.price_min} - P{service.price_max})
                     </SelectItem>
                   ))}
                 </SelectContent>

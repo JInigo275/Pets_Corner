@@ -108,7 +108,7 @@ export default function Appointments() {
         </div>
         {apt.total_price && (
           <span className="text-lg font-bold text-primary">
-            ${apt.total_price.toFixed(0)}
+            P{apt.total_price.toFixed(0)}
           </span>
         )}
       </div>

@@ -48,7 +48,7 @@ export default function Register() {
                 <PawPrint className="h-7 w-7" />
               </div>
               <h1 className="font-display text-2xl font-bold">Create Account</h1>
-              <p className="mt-2 text-muted-foreground">Join PawCare and pamper your pets</p>
+              <p className="mt-2 text-muted-foreground">Join Pets Corner and pamper your pets</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">

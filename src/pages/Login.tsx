@@ -41,7 +41,7 @@ export default function Login() {
                 <PawPrint className="h-7 w-7" />
               </div>
               <h1 className="font-display text-2xl font-bold">Welcome Back</h1>
-              <p className="mt-2 text-muted-foreground">Sign in to your PawCare account</p>
+              <p className="mt-2 text-muted-foreground">Sign in to your Pets Corner account</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">

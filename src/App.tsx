@@ -12,6 +12,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Services from "./pages/Services";
 import Booking from "./pages/Booking";
+import Shop from "./pages/Shop";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Pets from "./pages/dashboard/Pets";
 import Appointments from "./pages/dashboard/Appointments";
@@ -20,6 +21,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminAppointments from "./pages/admin/AdminAppointments";
 import AdminServices from "./pages/admin/AdminServices";
 import AdminCustomers from "./pages/admin/AdminCustomers";
+import AdminProducts from "./pages/admin/AdminProducts";
 import AdminPets from "./pages/admin/AdminPets";
 import NotFound from "./pages/NotFound";
 
@@ -40,6 +42,7 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/services" element={<Services />} />
             <Route path="/booking" element={<Booking />} />
+            <Route path="/shop" element={<Shop />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/dashboard/pets" element={<Pets />} />
             <Route path="/dashboard/appointments" element={<Appointments />} />
@@ -49,6 +52,7 @@ const App = () => (
             <Route path="/admin/appointments" element={<AdminAppointments />} />
             <Route path="/admin/pets" element={<AdminPets />} />
             <Route path="/admin/services" element={<AdminServices />} />
+            <Route path="/admin/products" element={<AdminProducts />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

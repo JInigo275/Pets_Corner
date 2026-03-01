@@ -156,9 +156,9 @@ export default function AdminAppointments() {
                       </Badge>
                     </td>
                     <td className="px-4 py-3">
-                      ${apt.total_price?.toFixed(0) || '0'}
+                      P{apt.total_price?.toFixed(0) || '0'}
                       {apt.discount_applied ? (
-                        <span className="ml-1 text-xs text-success">-${apt.discount_applied}</span>
+                        <span className="ml-1 text-xs text-success">-P{apt.discount_applied}</span>
                       ) : null}
                     </td>
                     <td className="px-4 py-3">
@@ -194,7 +194,7 @@ export default function AdminAppointments() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Total Price ($)</Label>
+                <Label>Total Price (P)</Label>
                 <Input
                   type="number"
                   value={editPrice}
@@ -203,7 +203,7 @@ export default function AdminAppointments() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Discount ($)</Label>
+                <Label>Discount (P)</Label>
                 <Input
                   type="number"
                   value={editDiscount}
@@ -213,9 +213,8 @@ export default function AdminAppointments() {
               </div>
               {editPrice && editDiscount && (
                 <div className="flex items-center gap-2 rounded-lg bg-success/10 p-3 text-success">
-                  <DollarSign className="h-4 w-4" />
                   <span className="font-medium">
-                    Final: ${(parseFloat(editPrice) - parseFloat(editDiscount || '0')).toFixed(2)}
+                    Final: P{(parseFloat(editPrice) - parseFloat(editDiscount || '0')).toFixed(2)}
                   </span>
                 </div>
               )}

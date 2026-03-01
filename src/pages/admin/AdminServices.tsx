@@ -272,7 +272,7 @@ export default function AdminServices() {
               <p className="text-sm text-muted-foreground">{service.description}</p>
               <div className="mt-4 flex items-center justify-between text-sm">
                 <span className="font-semibold text-primary">
-                  ${service.price_min} - ${service.price_max}
+                  P{service.price_min} - P{service.price_max}
                 </span>
                 <span className="text-muted-foreground">{service.duration_minutes} min</span>
               </div>
