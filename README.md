@@ -12,4 +12,24 @@ npm i
 npm run dev
 ```
 
+```sh
+Commiting to github:
+# Step 1:
+git init
+
+# Step 2:
+git checkout "<branch-name>"
+
+# Step 3:
+git add .
+
+# Step 4:
+git status
+
+# Step 5:
+git commit -m "<commit message>"
+
+# Step 6:
+git push -u origin "<branch-name>"
+```
 
