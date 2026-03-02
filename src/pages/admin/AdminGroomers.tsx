@@ -4,30 +4,29 @@ import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useAuth } from '@/lib/auth';
 import { supabase } from '@/integrations/supabase/client';
-import { Package, Plus, Loader2, Edit2, Trash2, Upload, X } from 'lucide-react';
+import { Plus, Loader2, Edit2, Trash2, Upload, X, User } from 'lucide-react';
 import { toast } from 'sonner';
 
-interface Product {
+interface Groomer {
   id: string;
   name: string;
-  description: string | null;
-  image_url: string | null;
-  category: string;
-  is_active: boolean;
+  specialty: string | null;
+  photo_url: string | null;
+  is_available: boolean | null;
+  created_at: string;
 }
 
-export default function AdminProducts() {
+export default function AdminGroomers() {
   const { isAdmin, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const [products, setProducts] = useState<Product[]>([]);
+  const [groomers, setGroomers] = useState<Groomer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingGroomer, setEditingGroomer] = useState<Groomer | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -35,14 +34,13 @@ export default function AdminProducts() {
 
   const [formData, setFormData] = useState({
     name: '',
-    description: '',
-    category: 'general',
-    is_active: true,
+    specialty: '',
+    is_available: true,
   });
 
   const resetForm = () => {
-    setFormData({ name: '', description: '', category: 'general', is_active: true });
-    setEditingProduct(null);
+    setFormData({ name: '', specialty: '', is_available: true });
+    setEditingGroomer(null);
     setImageFile(null);
     setImagePreview(null);
   };
@@ -52,15 +50,15 @@ export default function AdminProducts() {
       navigate('/dashboard');
       return;
     }
-    if (isAdmin) fetchProducts();
+    if (isAdmin) fetchGroomers();
   }, [isAdmin, authLoading, navigate]);
 
-  async function fetchProducts() {
+  async function fetchGroomers() {
     const { data } = await supabase
-      .from('products')
+      .from('groomers')
       .select('*')
-      .order('category');
-    if (data) setProducts(data);
+      .order('name');
+    if (data) setGroomers(data);
     setIsLoading(false);
   }
 
@@ -79,32 +77,31 @@ export default function AdminProducts() {
     setImagePreview(URL.createObjectURL(file));
   };
 
-  const uploadImage = async (productId: string): Promise<string | null> => {
+  const uploadPhoto = async (groomerId: string): Promise<string | null> => {
     if (!imageFile) return null;
     const ext = imageFile.name.split('.').pop();
-    const path = `${productId}.${ext}`;
+    const path = `groomers/${groomerId}.${ext}`;
     const { error } = await supabase.storage
-      .from('product-images')
+      .from('pet-photos')
       .upload(path, imageFile, { upsert: true });
     if (error) {
-      toast.error('Image upload failed');
+      toast.error('Photo upload failed');
       return null;
     }
     const { data: urlData } = supabase.storage
-      .from('product-images')
+      .from('pet-photos')
       .getPublicUrl(path);
     return `${urlData.publicUrl}?t=${Date.now()}`;
   };
 
-  const openEdit = (product: Product) => {
-    setEditingProduct(product);
+  const openEdit = (groomer: Groomer) => {
+    setEditingGroomer(groomer);
     setFormData({
-      name: product.name,
-      description: product.description || '',
-      category: product.category,
-      is_active: product.is_active,
+      name: groomer.name,
+      specialty: groomer.specialty || '',
+      is_available: groomer.is_available ?? true,
     });
-    setImagePreview(product.image_url || null);
+    setImagePreview(groomer.photo_url || null);
     setIsDialogOpen(true);
   };
 
@@ -112,54 +109,48 @@ export default function AdminProducts() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const productData: any = {
+    const groomerData: any = {
       name: formData.name.trim(),
-      description: formData.description.trim() || null,
-      category: formData.category.trim() || 'general',
-      is_active: formData.is_active,
+      specialty: formData.specialty.trim() || null,
+      is_available: formData.is_available,
     };
 
-    let productId = editingProduct?.id;
-
-    if (editingProduct) {
+    if (editingGroomer) {
       if (imageFile) {
-        const url = await uploadImage(editingProduct.id);
-        if (url) productData.image_url = url;
+        const url = await uploadPhoto(editingGroomer.id);
+        if (url) groomerData.photo_url = url;
       }
-      const { error } = await supabase.from('products').update(productData).eq('id', editingProduct.id);
+      const { error } = await supabase.from('groomers').update(groomerData).eq('id', editingGroomer.id);
       if (error) toast.error('Failed to update');
-      else toast.success('Product updated');
+      else toast.success('Groomer updated');
     } else {
-      const { data, error } = await supabase.from('products').insert(productData).select('id').single();
+      const { data, error } = await supabase.from('groomers').insert(groomerData).select('id').single();
       if (error) {
         toast.error('Failed to create');
       } else {
-        productId = data.id;
-        if (imageFile && productId) {
-          const url = await uploadImage(productId);
+        if (imageFile && data.id) {
+          const url = await uploadPhoto(data.id);
           if (url) {
-            await supabase.from('products').update({ image_url: url }).eq('id', productId);
+            await supabase.from('groomers').update({ photo_url: url }).eq('id', data.id);
           }
         }
-        toast.success('Product created');
+        toast.success('Groomer created');
       }
     }
 
     setIsSubmitting(false);
     setIsDialogOpen(false);
     resetForm();
-    fetchProducts();
+    fetchGroomers();
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this product?')) return;
-    // Also delete image from storage
-    await supabase.storage.from('product-images').remove([`${id}.jpg`, `${id}.png`, `${id}.jpeg`, `${id}.webp`]);
-    const { error } = await supabase.from('products').delete().eq('id', id);
+    if (!confirm('Delete this groomer?')) return;
+    const { error } = await supabase.from('groomers').delete().eq('id', id);
     if (error) toast.error('Failed to delete');
     else {
-      toast.success('Product deleted');
-      fetchProducts();
+      toast.success('Groomer deleted');
+      fetchGroomers();
     }
   };
 
@@ -178,8 +169,8 @@ export default function AdminProducts() {
       <div className="container py-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="mb-2 font-display text-3xl font-bold">Manage Products</h1>
-            <p className="text-muted-foreground">Add and edit shop products</p>
+            <h1 className="mb-2 font-display text-3xl font-bold">Manage Groomers</h1>
+            <p className="text-muted-foreground">Add, edit, and manage your grooming staff</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => navigate('/admin')}>Back to Admin</Button>
@@ -187,12 +178,12 @@ export default function AdminProducts() {
               <DialogTrigger asChild>
                 <Button variant="hero">
                   <Plus className="mr-2 h-4 w-4" />
-                  Add Product
+                  Add Groomer
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>{editingProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
+                  <DialogTitle>{editingGroomer ? 'Edit Groomer' : 'Add New Groomer'}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
@@ -200,11 +191,11 @@ export default function AdminProducts() {
                     <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
                   </div>
                   <div className="space-y-2">
-                    <Label>Category</Label>
-                    <Input value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} placeholder="e.g. food, toys, grooming" />
+                    <Label>Specialty</Label>
+                    <Input value={formData.specialty} onChange={(e) => setFormData({ ...formData, specialty: e.target.value })} placeholder="e.g. Large breeds, Cats, Show cuts" />
                   </div>
                   <div className="space-y-2">
-                    <Label>Product Image: </Label>
+                    <Label>Photo</Label>
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -214,7 +205,7 @@ export default function AdminProducts() {
                     />
                     {imagePreview ? (
                       <div className="relative inline-block">
-                        <img src={imagePreview} alt="Preview" className="h-24 w-24 rounded-xl object-cover border border-border" />
+                        <img src={imagePreview} alt="Preview" className="h-24 w-24 rounded-full object-cover border border-border" />
                         <button
                           type="button"
                           onClick={() => { setImageFile(null); setImagePreview(null); }}
@@ -226,21 +217,17 @@ export default function AdminProducts() {
                     ) : (
                       <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
                         <Upload className="mr-2 h-4 w-4" />
-                        Upload Image
+                        Upload Photo
                       </Button>
                     )}
                   </div>
-                  <div className="space-y-2">
-                    <Label>Description</Label>
-                    <Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} />
-                  </div>
                   <div className="flex items-center gap-2">
-                    <Switch checked={formData.is_active} onCheckedChange={(v) => setFormData({ ...formData, is_active: v })} />
-                    <Label>Active</Label>
+                    <Switch checked={formData.is_available} onCheckedChange={(v) => setFormData({ ...formData, is_available: v })} />
+                    <Label>Available</Label>
                   </div>
                   <Button type="submit" className="w-full" disabled={isSubmitting}>
                     {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {editingProduct ? 'Update' : 'Create'} Product
+                    {editingGroomer ? 'Update' : 'Create'} Groomer
                   </Button>
                 </form>
               </DialogContent>
@@ -249,31 +236,40 @@ export default function AdminProducts() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {products.map((product) => (
+          {groomers.length === 0 && (
+            <div className="col-span-full rounded-xl border border-dashed border-border p-12 text-center">
+              <User className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+              <h3 className="mb-2 font-display text-lg font-bold">No groomers yet</h3>
+              <p className="text-muted-foreground">Add your first groomer to get started.</p>
+            </div>
+          )}
+          {groomers.map((groomer) => (
             <div
-              key={product.id}
-              className={`rounded-xl border bg-card p-6 transition-all ${product.is_active ? 'border-border' : 'border-destructive/30 opacity-60'}`}
+              key={groomer.id}
+              className={`rounded-xl border bg-card p-6 transition-all ${groomer.is_available ? 'border-border' : 'border-destructive/30 opacity-60'}`}
             >
               <div className="mb-4 flex items-start justify-between">
-                {product.image_url ? (
-                  <img src={product.image_url} alt={product.name} className="h-12 w-12 rounded-xl object-cover" />
+                {groomer.photo_url ? (
+                  <img src={groomer.photo_url} alt={groomer.name} className="h-14 w-14 rounded-full object-cover border border-border" />
                 ) : (
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <Package className="h-6 w-6" />
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <User className="h-7 w-7" />
                   </div>
                 )}
                 <div className="flex gap-1">
-                  <Button variant="ghost" size="icon" onClick={() => openEdit(product)}>
+                  <Button variant="ghost" size="icon" onClick={() => openEdit(groomer)}>
                     <Edit2 className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(product.id)}>
+                  <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(groomer.id)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
-              <h3 className="mb-1 font-display font-bold">{product.name}</h3>
-              <p className="mb-2 text-sm capitalize text-muted-foreground">{product.category}</p>
-              {product.description && <p className="text-sm text-muted-foreground">{product.description}</p>}
+              <h3 className="mb-1 font-display font-bold">{groomer.name}</h3>
+              {groomer.specialty && <p className="mb-1 text-sm text-muted-foreground">{groomer.specialty}</p>}
+              <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${groomer.is_available ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}>
+                {groomer.is_available ? 'Available' : 'Unavailable'}
+              </span>
             </div>
           ))}
         </div>

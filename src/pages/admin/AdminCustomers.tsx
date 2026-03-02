@@ -77,6 +77,15 @@ export default function AdminCustomers() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [customerRoles, setCustomerRoles] = useState<Record<string, boolean>>({});
   const [togglingAdmin, setTogglingAdmin] = useState<string | null>(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editingCustomerId, setEditingCustomerId] = useState<string | null>(null);
+  const [editFullName, setEditFullName] = useState('');
+  const [editPhone, setEditPhone] = useState<string | null>(null);
+  const [editAddress, setEditAddress] = useState<string | null>(null);
+  const [editLoyaltyCard, setEditLoyaltyCard] = useState<string | null>(null);
+  const [editPoints, setEditPoints] = useState<number | null>(null);
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [deletingCustomerId, setDeletingCustomerId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -174,6 +183,78 @@ export default function AdminCustomers() {
 
     setServiceHistory(history || []);
     setIsLoadingHistory(false);
+  }
+
+  async function handleSaveEdit() {
+    if (!editingCustomerId) return;
+    setIsSavingEdit(true);
+    try {
+      const updates: any = {
+        full_name: editFullName,
+        phone: editPhone,
+        address: editAddress,
+        loyalty_card_number: editLoyaltyCard,
+        loyalty_points: editPoints,
+      };
+
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', editingCustomerId);
+
+      if (error) {
+        toast.error('Failed to save customer');
+      } else {
+        toast.success('Customer updated');
+        await fetchCustomers();
+        setIsEditOpen(false);
+      }
+    } catch (err) {
+      toast.error('Failed to save customer');
+    }
+    setIsSavingEdit(false);
+    setEditingCustomerId(null);
+  }
+
+  async function handleDeleteCustomer(customer: Customer) {
+    const confirmed = window.confirm(
+      `Delete ${customer.full_name}? This will remove their profile, pets, and history.`
+    );
+    if (!confirmed) return;
+    setDeletingCustomerId(customer.user_id);
+
+    try {
+      // Attempt to delete the Auth user via Supabase Edge Function (server-side)
+      try {
+        await supabase.functions.invoke('delete-user', {
+          method: 'POST',
+          body: JSON.stringify({ user_id: customer.user_id }),
+        });
+      } catch (fnErr) {
+        // If function is not deployed or invocation fails, we'll continue with DB cleanup
+        console.warn('delete-user function invocation failed', fnErr);
+        toast.error('Could not remove auth user automatically; please remove manually if needed.');
+      }
+      // delete pets
+      await supabase.from('pets').delete().eq('owner_id', customer.user_id);
+      // delete service history
+      await supabase.from('service_history').delete().eq('customer_id', customer.user_id);
+      // delete user roles
+      await supabase.from('user_roles').delete().eq('user_id', customer.user_id);
+      // delete profile
+      const { error } = await supabase.from('profiles').delete().eq('id', customer.id);
+
+      if (error) {
+        toast.error('Failed to delete customer');
+      } else {
+        toast.success('Customer deleted');
+        await fetchCustomers();
+      }
+    } catch (err) {
+      toast.error('Failed to delete customer');
+    }
+
+    setDeletingCustomerId(null);
   }
 
   const filteredCustomers = customers.filter(
@@ -349,6 +430,33 @@ export default function AdminCustomers() {
                           <Eye className="mr-1 h-4 w-4" />
                           Details
                         </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setEditingCustomerId(customer.id);
+                            setEditFullName(customer.full_name || '');
+                            setEditPhone(customer.phone || null);
+                            setEditAddress(customer.address || null);
+                            setEditLoyaltyCard(customer.loyalty_card_number || null);
+                            setEditPoints(customer.loyalty_points || 0);
+                            setIsEditOpen(true);
+                          }}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          disabled={deletingCustomerId === customer.user_id}
+                          onClick={() => handleDeleteCustomer(customer)}
+                        >
+                          {deletingCustomerId === customer.user_id ? (
+                            <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                          ) : (
+                            'Delete'
+                          )}
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -472,6 +580,46 @@ export default function AdminCustomers() {
                 </div>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+        {/* Edit Customer Dialog */}
+        <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Edit Customer</DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm text-muted-foreground">Full name</label>
+                <Input value={editFullName} onChange={(e) => setEditFullName(e.target.value)} className="mt-1" />
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground">Phone</label>
+                <Input value={editPhone || ''} onChange={(e) => setEditPhone(e.target.value || null)} className="mt-1" />
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground">Address</label>
+                <Input value={editAddress || ''} onChange={(e) => setEditAddress(e.target.value || null)} className="mt-1" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-sm text-muted-foreground">Loyalty Card</label>
+                  <Input value={editLoyaltyCard || ''} onChange={(e) => setEditLoyaltyCard(e.target.value || null)} className="mt-1" />
+                </div>
+                <div>
+                  <label className="text-sm text-muted-foreground">Points</label>
+                  <Input type="number" value={editPoints ?? 0} onChange={(e) => setEditPoints(Number(e.target.value || 0))} className="mt-1" />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <Button variant="ghost" onClick={() => { setIsEditOpen(false); setEditingCustomerId(null); }}>Cancel</Button>
+                <Button onClick={handleSaveEdit} disabled={isSavingEdit}>
+                  {isSavingEdit ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save'}
+                </Button>
+              </div>
+            </div>
           </DialogContent>
         </Dialog>
       </div>

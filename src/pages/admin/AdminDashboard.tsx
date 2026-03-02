@@ -10,6 +10,7 @@ import {
   Calendar, 
   Scissors,
   Package,
+  UserCheck,
   Loader2,
   ArrowRight,
   AlertCircle
@@ -21,6 +22,7 @@ interface AdminStats {
   appointmentCount: number;
   serviceCount: number;
   productCount: number;
+  groomerCount: number;
 }
 
 export default function AdminDashboard() {
@@ -32,6 +34,7 @@ export default function AdminDashboard() {
     appointmentCount: 0,
     serviceCount: 0,
     productCount: 0,
+    groomerCount: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -47,12 +50,13 @@ export default function AdminDashboard() {
     }
 
     async function fetchStats() {
-      const [customersRes, petsRes, appointmentsRes, servicesRes, productRes] = await Promise.all([
+      const [customersRes, petsRes, appointmentsRes, servicesRes, productRes, groomerRes] = await Promise.all([
         supabase.from('profiles').select('id', { count: 'exact' }),
         supabase.from('pets').select('id', { count: 'exact' }),
         supabase.from('appointments').select('id', { count: 'exact' }),
         supabase.from('services').select('id', { count: 'exact' }),
         supabase.from('products').select('id', {count: 'exact'}),
+        supabase.from('groomers').select('id', {count: 'exact'}),
       ]);
 
       setStats({
@@ -61,6 +65,7 @@ export default function AdminDashboard() {
         appointmentCount: appointmentsRes.count || 0,
         serviceCount: servicesRes.count || 0,
         productCount: productRes.count || 0,
+        groomerCount: groomerRes.count || 0,
       });
       setIsLoading(false);
     }
@@ -96,6 +101,7 @@ export default function AdminDashboard() {
     { label: 'Appointments', value: stats.appointmentCount, icon: Calendar, href: '/admin/appointments', color: 'text-warning bg-warning/10' },
     { label: 'Services', value: stats.serviceCount, icon: Scissors, href: '/admin/services', color: 'text-success bg-success/10' },
     { label: 'Products', value: stats.productCount, icon: Package, href: '/admin/products', color: 'text-primary bg-primary/10' },
+    { label: 'Groomers', value: stats.groomerCount, icon: UserCheck, href: '/admin/groomers', color: 'text-accent bg-accent/10' },
   ];
 
   return (
@@ -124,6 +130,14 @@ export default function AdminDashboard() {
               <p className="font-display text-2xl font-bold">{stat.value}</p>
             </Link>
           ))}
+        </div>
+
+        <div className="flex items-center my-8">
+            <div className="flex-grow border-t-4 border-y-stone-400" />
+            <span className="px-3 text-muted-foreground text-stone-700">
+          Admin Quick Access
+            </span>
+            <div className="flex-grow border-t-4 border-y-stone-400" />
         </div>
 
         {/* Quick Actions */}
@@ -156,6 +170,12 @@ export default function AdminDashboard() {
             <Link to="/admin/products" className="flex flex-col items-center gap-2">
               <Package className="h-6 w-6" />
               <span>Manage Products</span>
+            </Link>
+          </Button>
+          <Button variant="outline" size="lg" className="h-auto py-6" asChild>
+            <Link to="/admin/groomers" className="flex flex-col items-center gap-2">
+              <UserCheck className="h-6 w-6" />
+              <span>Manage Groomers</span>
             </Link>
           </Button>
         </div>

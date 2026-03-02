@@ -22,7 +22,7 @@ export default function Index() {
       icon: Scissors,
       title: 'Pet Grooming Services',
       description: 'Offers basic and full grooming, with ear cleaning, teeth brushing, and other pampering services.',
-      price: 'Starts at 400'
+      price: 'Starts at 100'
     },
     {
       icon: Home,
