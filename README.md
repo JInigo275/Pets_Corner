@@ -33,3 +33,25 @@ git commit -m "<commit message>"
 git push -u origin "<branch-name>"
 ```
 
+```sh
+# Updating local files from main branch
+
+# Step 1:
+Open blank terminal
+
+# Step 2:
+git pull
+```
+
+```sh
+# Opening site on mobile
+
+# Step 1:
+Make sure both devices are connected on the same network
+
+# Step 2:
+npm run dev
+
+# Step 3:
+Under "Network" copy link into mobile browser
+```
