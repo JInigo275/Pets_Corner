@@ -142,7 +142,7 @@ export default function AdminDashboard() {
 
         {/* Quick Actions */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Button variant="default" size="lg" className="h-auto py-6" asChild>
+          <Button variant="outline" size="lg" className="h-auto py-6" asChild>
             <Link to="/admin/customers" className="flex flex-col items-center gap-2">
               <Users className="h-6 w-6" />
               <span>Manage Customers</span>
