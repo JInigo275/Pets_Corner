@@ -26,8 +26,8 @@ interface Appointment {
   appointment_date: string;
   start_time: string;
   status: string;
-  pets: { name: string } | null;
-  services: { name: string } | null;
+  pets: { name: string }[] | null;
+  services: { name: string }[] | null;
 }
 
 export default function Dashboard() {
@@ -54,6 +54,7 @@ export default function Dashboard() {
           .select('id, appointment_date, start_time, status, pets(name), services(name)')
           .eq('customer_id', user.id)
           .gte('appointment_date', today)
+          .in('status', ['pending', 'confirmed', 'in-progress'])
           .order('appointment_date', { ascending: true })
           .limit(5),
         supabase
@@ -92,7 +93,7 @@ export default function Dashboard() {
     { label: 'My Pets', value: stats.petCount, icon: PawPrint, href: '/dashboard/pets', color: 'text-primary bg-primary/10' },
     { label: 'Upcoming', value: stats.upcomingAppointments, icon: Calendar, href: '/dashboard/appointments', color: 'text-accent bg-accent/10' },
     { label: 'Loyalty Points', value: stats.loyaltyPoints, icon: Star, href: '/dashboard/loyalty', color: 'text-warning bg-warning/10' },
-    { label: 'Total Spent', value: `P${stats.totalSpent.toFixed(0)}`, icon: CreditCard, href: '/dashboard/history', color: 'text-success bg-success/10' },
+    { label: 'Total Spent', value: `$${stats.totalSpent.toFixed(0)}`, icon: CreditCard, href: '/dashboard/history', color: 'text-success bg-success/10' },
   ];
 
   return (
@@ -101,7 +102,7 @@ export default function Dashboard() {
         {/* Welcome Header */}
         <div className="mb-8">
           <h1 className="mb-2 font-display text-3xl font-bold">
-            Welcome back, {profile?.full_name?.split(' ')[0] || 'there'}! 
+            Welcome back, {profile?.full_name?.split(' ')[0] || 'there'}! 👋
           </h1>
           <p className="text-muted-foreground">
             Here's an overview of your pet care activities
@@ -175,9 +176,9 @@ export default function Dashboard() {
                   className="flex items-center justify-between rounded-lg border border-border p-4"
                 >
                   <div>
-                    <p className="font-medium">{apt.pets?.name || 'Pet'}</p>
+                    <p className="font-medium">{apt.pets?.[0]?.name || 'Pet'}</p>
                     <p className="text-sm text-muted-foreground">
-                      {apt.services?.name || 'Service'}
+                      {apt.services?.[0]?.name || 'Service'}
                     </p>
                   </div>
                   <div className="text-right">

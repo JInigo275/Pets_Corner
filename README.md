@@ -1,3 +1,5 @@
+LAHAT TO TERMINAL MGA BUSET
+
 ```sh
 # Step 1: Clone the repository using the project's Git URL.
 git clone https://github.com/Cynic-Dev/Pets_Corner

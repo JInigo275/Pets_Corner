@@ -19,6 +19,7 @@ interface Product {
   image_url: string | null;
   category: string;
   is_active: boolean;
+  price: number | null;
 }
 
 export default function AdminProducts() {
@@ -38,10 +39,11 @@ export default function AdminProducts() {
     description: '',
     category: 'general',
     is_active: true,
+    price: '' as string,
   });
 
   const resetForm = () => {
-    setFormData({ name: '', description: '', category: 'general', is_active: true });
+    setFormData({ name: '', description: '', category: 'general', is_active: true, price: '' });
     setEditingProduct(null);
     setImageFile(null);
     setImagePreview(null);
@@ -103,6 +105,7 @@ export default function AdminProducts() {
       description: product.description || '',
       category: product.category,
       is_active: product.is_active,
+      price: product.price != null ? String(product.price) : '',
     });
     setImagePreview(product.image_url || null);
     setIsDialogOpen(true);
@@ -117,6 +120,7 @@ export default function AdminProducts() {
       description: formData.description.trim() || null,
       category: formData.category.trim() || 'general',
       is_active: formData.is_active,
+      price: formData.price !== '' ? parseFloat(formData.price) : null,
     };
 
     let productId = editingProduct?.id;
@@ -204,6 +208,10 @@ export default function AdminProducts() {
                     <Input value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} placeholder="e.g. food, toys, grooming" />
                   </div>
                   <div className="space-y-2">
+                    <Label>Price (₱)</Label>
+                    <Input type="number" step="0.01" min="0" value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} placeholder="Leave empty if no price" />
+                  </div>
+                  <div className="space-y-2">
                     <Label>Product Image: </Label>
                     <input
                       ref={fileInputRef}
@@ -272,6 +280,7 @@ export default function AdminProducts() {
                 </div>
               </div>
               <h3 className="mb-1 font-display font-bold">{product.name}</h3>
+              {product.price != null && <p className="mb-1 text-sm font-semibold text-primary">₱{product.price.toFixed(2)}</p>}
               <p className="mb-2 text-sm capitalize text-muted-foreground">{product.category}</p>
               {product.description && <p className="text-sm text-muted-foreground">{product.description}</p>}
             </div>
