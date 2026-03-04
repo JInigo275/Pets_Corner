@@ -75,7 +75,7 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-primary" />
-                0968-237-2308 | (045) 887 6020
+                (045) 887 6020
               </li>
 
               <li className="flex items-start gap-2">

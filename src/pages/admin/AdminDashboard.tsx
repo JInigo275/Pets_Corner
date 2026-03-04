@@ -11,6 +11,7 @@ import {
   Scissors,
   Package,
   UserCheck,
+  BarChart3,
   Loader2,
   ArrowRight,
   AlertCircle
@@ -21,8 +22,6 @@ interface AdminStats {
   petCount: number;
   appointmentCount: number;
   serviceCount: number;
-  productCount: number;
-  groomerCount: number;
 }
 
 export default function AdminDashboard() {
@@ -33,8 +32,6 @@ export default function AdminDashboard() {
     petCount: 0,
     appointmentCount: 0,
     serviceCount: 0,
-    productCount: 0,
-    groomerCount: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -50,13 +47,11 @@ export default function AdminDashboard() {
     }
 
     async function fetchStats() {
-      const [customersRes, petsRes, appointmentsRes, servicesRes, productRes, groomerRes] = await Promise.all([
+      const [customersRes, petsRes, appointmentsRes, servicesRes] = await Promise.all([
         supabase.from('profiles').select('id', { count: 'exact' }),
         supabase.from('pets').select('id', { count: 'exact' }),
         supabase.from('appointments').select('id', { count: 'exact' }),
         supabase.from('services').select('id', { count: 'exact' }),
-        supabase.from('products').select('id', {count: 'exact'}),
-        supabase.from('groomers').select('id', {count: 'exact'}),
       ]);
 
       setStats({
@@ -64,8 +59,6 @@ export default function AdminDashboard() {
         petCount: petsRes.count || 0,
         appointmentCount: appointmentsRes.count || 0,
         serviceCount: servicesRes.count || 0,
-        productCount: productRes.count || 0,
-        groomerCount: groomerRes.count || 0,
       });
       setIsLoading(false);
     }
@@ -100,8 +93,9 @@ export default function AdminDashboard() {
     { label: 'Pets', value: stats.petCount, icon: PawPrint, href: '/admin/pets', color: 'text-accent bg-accent/10' },
     { label: 'Appointments', value: stats.appointmentCount, icon: Calendar, href: '/admin/appointments', color: 'text-warning bg-warning/10' },
     { label: 'Services', value: stats.serviceCount, icon: Scissors, href: '/admin/services', color: 'text-success bg-success/10' },
-    { label: 'Products', value: stats.productCount, icon: Package, href: '/admin/products', color: 'text-primary bg-primary/10' },
-    { label: 'Groomers', value: stats.groomerCount, icon: UserCheck, href: '/admin/groomers', color: 'text-accent bg-accent/10' },
+    { label: 'Products', value: 0, icon: Package, href: '/admin/products', color: 'text-primary bg-primary/10' },
+    { label: 'Groomers', value: 0, icon: UserCheck, href: '/admin/groomers', color: 'text-accent bg-accent/10' },
+    { label: 'Analytics', value: null, icon: BarChart3, href: '/admin/analytics', color: 'text-success bg-success/10' },
   ];
 
   return (
@@ -127,22 +121,15 @@ export default function AdminDashboard() {
                 <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
               </div>
               <p className="text-sm text-muted-foreground">{stat.label}</p>
-              <p className="font-display text-2xl font-bold">{stat.value}</p>
+              {stat.value !== null && <p className="font-display text-2xl font-bold">{stat.value}</p>}
+              {stat.value === null && <p className="font-display text-sm font-medium text-primary">View →</p>}
             </Link>
           ))}
         </div>
 
-        <div className="flex items-center my-8">
-            <div className="flex-grow border-t-4 border-y-stone-400" />
-            <span className="px-3 text-muted-foreground text-stone-700">
-          Admin Quick Access
-            </span>
-            <div className="flex-grow border-t-4 border-y-stone-400" />
-        </div>
-
         {/* Quick Actions */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Button variant="outline" size="lg" className="h-auto py-6" asChild>
+          <Button variant="default" size="lg" className="h-auto py-6" asChild>
             <Link to="/admin/customers" className="flex flex-col items-center gap-2">
               <Users className="h-6 w-6" />
               <span>Manage Customers</span>
@@ -176,6 +163,12 @@ export default function AdminDashboard() {
             <Link to="/admin/groomers" className="flex flex-col items-center gap-2">
               <UserCheck className="h-6 w-6" />
               <span>Manage Groomers</span>
+            </Link>
+          </Button>
+          <Button variant="outline" size="lg" className="h-auto py-6" asChild>
+            <Link to="/admin/analytics" className="flex flex-col items-center gap-2">
+              <BarChart3 className="h-6 w-6" />
+              <span>View Analytics</span>
             </Link>
           </Button>
         </div>

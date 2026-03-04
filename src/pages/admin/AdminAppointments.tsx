@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useAuth } from '@/lib/auth';
 import { supabase } from '@/integrations/supabase/client';
 import { Calendar, Loader2, Edit2, DollarSign } from 'lucide-react';
@@ -38,6 +39,82 @@ const statusStyles: Record<string, string> = {
   cancelled: 'bg-destructive/10 text-destructive border-destructive/30',
 };
 
+const categories = [
+  { value: 'active', label: 'Active', statuses: ['pending', 'confirmed', 'in-progress'] },
+  { value: 'completed', label: 'Completed', statuses: ['completed'] },
+  { value: 'cancelled', label: 'Cancelled', statuses: ['cancelled'] },
+  { value: 'all', label: 'All', statuses: [] },
+];
+
+function AppointmentTable({ appointments, onEdit }: { appointments: Appointment[]; onEdit: (apt: Appointment) => void }) {
+  if (appointments.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+        <Calendar className="mb-3 h-10 w-10 opacity-40" />
+        <p>No appointments found</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full">
+        <thead className="border-b border-border bg-muted/50">
+          <tr>
+            <th className="px-4 py-3 text-left text-sm font-medium">Date</th>
+            <th className="px-4 py-3 text-left text-sm font-medium">Customer</th>
+            <th className="px-4 py-3 text-left text-sm font-medium">Pet</th>
+            <th className="px-4 py-3 text-left text-sm font-medium">Service</th>
+            <th className="px-4 py-3 text-left text-sm font-medium">Status</th>
+            <th className="px-4 py-3 text-left text-sm font-medium">Price</th>
+            <th className="px-4 py-3 text-left text-sm font-medium">Actions</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border">
+          {appointments.map((apt) => (
+            <tr key={apt.id} className="hover:bg-muted/30">
+              <td className="px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="font-medium">{format(new Date(apt.appointment_date), 'MMM d')}</p>
+                    <p className="text-xs text-muted-foreground">{apt.start_time}</p>
+                  </div>
+                </div>
+              </td>
+              <td className="px-4 py-3 text-muted-foreground text-xs">{apt.customer_id.substring(0, 8)}...</td>
+              <td className="px-4 py-3">{apt.pets?.name || 'N/A'}</td>
+              <td className="px-4 py-3">{apt.services?.name || 'N/A'}</td>
+              <td className="px-4 py-3">
+                <Badge variant="outline" className={statusStyles[apt.status]}>
+                  {apt.status}
+                </Badge>
+              </td>
+              <td className="px-4 py-3">
+                P{apt.total_price?.toFixed(0) || '0'}
+                {apt.discount_applied ? (
+                  <span className="ml-1 text-xs text-success">-P{apt.discount_applied}</span>
+                ) : null}
+              </td>
+              <td className="px-4 py-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEdit(apt)}
+                  disabled={apt.status === 'cancelled' || apt.status === 'completed'}
+                  className={apt.status === 'cancelled' || apt.status === 'completed' ? 'opacity-40 cursor-not-allowed' : ''}
+                >
+                  <Edit2 className="h-4 w-4" />
+                </Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export default function AdminAppointments() {
   const { isAdmin, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -59,14 +136,8 @@ export default function AdminAppointments() {
   async function fetchAppointments() {
     const { data } = await supabase
       .from('appointments')
-      .select(`
-        *,
-        pets(name),
-        services(name),
-        groomers(name)
-      `)
+      .select(`*, pets(name), services(name), groomers(name)`)
       .order('appointment_date', { ascending: false });
-    
     if (data) setAppointments(data);
     setIsLoading(false);
   }
@@ -80,7 +151,6 @@ export default function AdminAppointments() {
 
   const handleUpdate = async () => {
     if (!selectedAppointment) return;
-
     const { error } = await supabase
       .from('appointments')
       .update({
@@ -89,7 +159,6 @@ export default function AdminAppointments() {
         discount_applied: editDiscount ? parseFloat(editDiscount) : 0,
       })
       .eq('id', selectedAppointment.id);
-
     if (error) toast.error('Failed to update');
     else {
       toast.success('Appointment updated');
@@ -97,6 +166,9 @@ export default function AdminAppointments() {
       setSelectedAppointment(null);
     }
   };
+
+  const getFiltered = (statuses: string[]) =>
+    statuses.length === 0 ? appointments : appointments.filter((a) => statuses.includes(a.status));
 
   if (authLoading || isLoading) {
     return (
@@ -121,65 +193,27 @@ export default function AdminAppointments() {
           </Button>
         </div>
 
-        <div className="rounded-xl border border-border bg-card">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="border-b border-border bg-muted/50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium">Date</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">Customer</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">Pet</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">Service</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">Status</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">Price</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {appointments.map((apt) => (
-                  <tr key={apt.id} className="hover:bg-muted/30">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                        <div>
-                          <p className="font-medium">{format(new Date(apt.appointment_date), 'MMM d')}</p>
-                          <p className="text-xs text-muted-foreground">{apt.start_time}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground text-xs">{apt.customer_id.substring(0, 8)}...</td>
-                    <td className="px-4 py-3">{apt.pets?.name || 'N/A'}</td>
-                    <td className="px-4 py-3">{apt.services?.name || 'N/A'}</td>
-                    <td className="px-4 py-3">
-                      <Badge variant="outline" className={statusStyles[apt.status]}>
-                        {apt.status}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-3">
-                      ${apt.total_price?.toFixed(0) || '0'}
-                      {apt.discount_applied ? (
-                        <span className="ml-1 text-xs text-success">-${apt.discount_applied}</span>
-                      ) : null}
-                    </td>
-                    <td className="px-4 py-3">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => openEdit(apt)}
-                        disabled={apt.status === 'cancelled' || apt.status === 'completed'}
-                        className={apt.status === 'cancelled' || apt.status === 'completed' ? 'opacity-40 cursor-not-allowed' : ''}
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <Tabs defaultValue="active" className="w-full">
+          <TabsList className="mb-4 w-full justify-start">
+            {categories.map((cat) => (
+              <TabsTrigger key={cat.value} value={cat.value} className="gap-2">
+                {cat.label}
+                <Badge variant="secondary" className="ml-1 h-5 min-w-[20px] px-1.5 text-[10px]">
+                  {getFiltered(cat.statuses).length}
+                </Badge>
+              </TabsTrigger>
+            ))}
+          </TabsList>
 
-        {/* Edit Dialog */}
+          {categories.map((cat) => (
+            <TabsContent key={cat.value} value={cat.value}>
+              <div className="rounded-xl border border-border bg-card">
+                <AppointmentTable appointments={getFiltered(cat.statuses)} onEdit={openEdit} />
+              </div>
+            </TabsContent>
+          ))}
+        </Tabs>
+
         <Dialog open={!!selectedAppointment} onOpenChange={() => setSelectedAppointment(null)}>
           <DialogContent>
             <DialogHeader>
@@ -189,9 +223,7 @@ export default function AdminAppointments() {
               <div className="space-y-2">
                 <Label>Status</Label>
                 <Select value={editStatus} onValueChange={(v) => setEditStatus(v as Appointment['status'])}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {statusOptions.map((s) => (
                       <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>
@@ -200,34 +232,22 @@ export default function AdminAppointments() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Total Price ($)</Label>
-                <Input
-                  type="number"
-                  value={editPrice}
-                  onChange={(e) => setEditPrice(e.target.value)}
-                  placeholder="0.00"
-                />
+                <Label>Total Price (P)</Label>
+                <Input type="number" value={editPrice} onChange={(e) => setEditPrice(e.target.value)} placeholder="0.00" />
               </div>
               <div className="space-y-2">
-                <Label>Discount ($)</Label>
-                <Input
-                  type="number"
-                  value={editDiscount}
-                  onChange={(e) => setEditDiscount(e.target.value)}
-                  placeholder="0.00"
-                />
+                <Label>Discount (P)</Label>
+                <Input type="number" value={editDiscount} onChange={(e) => setEditDiscount(e.target.value)} placeholder="0.00" />
               </div>
               {editPrice && editDiscount && (
                 <div className="flex items-center gap-2 rounded-lg bg-success/10 p-3 text-success">
                   <DollarSign className="h-4 w-4" />
                   <span className="font-medium">
-                    Final: ${(parseFloat(editPrice) - parseFloat(editDiscount || '0')).toFixed(2)}
+                    Final: P{(parseFloat(editPrice) - parseFloat(editDiscount || '0')).toFixed(2)}
                   </span>
                 </div>
               )}
-              <Button onClick={handleUpdate} className="w-full">
-                Update Appointment
-              </Button>
+              <Button onClick={handleUpdate} className="w-full">Update Appointment</Button>
             </div>
           </DialogContent>
         </Dialog>
