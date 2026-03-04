@@ -289,17 +289,12 @@ export default function AdminCustomers() {
     <Layout>
       <div className="container py-8">
         <div className="mb-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/admin')}
-            className="mb-4"
-          >
-            <ChevronLeft className="mr-1 h-4 w-4" />
-            Back to Admin
-          </Button>
           <div className="flex items-center justify-between">
             <div>
+              <Button variant="outline" size="sm" onClick={() => navigate('/admin')} className="mb-4">
+                <ChevronLeft className="mr-2 h-4 w-4" />
+                Back to Admin
+              </Button>
               <h1 className="flex items-center gap-2 font-display text-3xl font-bold">
                 <Users className="h-8 w-8 text-primary" />
                 Customer Management

@@ -9,7 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useAuth } from '@/lib/auth';
 import { supabase } from '@/integrations/supabase/client';
-import { Package, Plus, Loader2, Edit2, Trash2, Upload, X } from 'lucide-react';
+import { Package, Plus, Loader2, Edit2, Trash2, Upload, X, ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Product {
@@ -186,7 +186,10 @@ export default function AdminProducts() {
             <p className="text-muted-foreground">Add and edit shop products</p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => navigate('/admin')}>Back to Admin</Button>
+            <Button variant="outline" onClick={() => navigate('/admin')}>
+              <ChevronLeft className="mr-2 h-4 w-4" />
+              Back to Admin
+            </Button>
             <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) resetForm(); }}>
               <DialogTrigger asChild>
                 <Button variant="hero">

@@ -6,7 +6,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useAuth } from '@/lib/auth';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, TrendingUp, Scissors, UserCheck, DollarSign, BarChart3, CalendarIcon } from 'lucide-react';
+import { Loader2, TrendingUp, Scissors, UserCheck, DollarSign, BarChart3, CalendarIcon, ChevronLeft } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { format, subDays, startOfMonth, endOfMonth, subMonths, startOfYear } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -169,6 +169,7 @@ export default function AdminAnalytics() {
             <p className="text-muted-foreground">Business insights and performance metrics</p>
           </div>
           <Button variant="outline" onClick={() => navigate('/admin')}>
+            <ChevronLeft className="mr-2 h-4 w-4" />
             Back to Admin
           </Button>
         </div>

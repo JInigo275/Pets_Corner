@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useAuth } from '@/lib/auth';
 import { supabase } from '@/integrations/supabase/client';
-import { Calendar, Loader2, Edit2, DollarSign } from 'lucide-react';
+import { Calendar, Loader2, Edit2, DollarSign, ChevronLeft } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
@@ -189,6 +189,7 @@ export default function AdminAppointments() {
             <p className="text-muted-foreground">View and update all appointments</p>
           </div>
           <Button variant="outline" onClick={() => navigate('/admin')}>
+            <ChevronLeft className="mr-2 h-4 w-4" />
             Back to Admin
           </Button>
         </div>

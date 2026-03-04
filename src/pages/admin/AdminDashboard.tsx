@@ -22,6 +22,8 @@ interface AdminStats {
   petCount: number;
   appointmentCount: number;
   serviceCount: number;
+  productCount: number;
+  groomerCount: number;
 }
 
 export default function AdminDashboard() {
@@ -32,6 +34,8 @@ export default function AdminDashboard() {
     petCount: 0,
     appointmentCount: 0,
     serviceCount: 0,
+    productCount: 0,
+    groomerCount: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -47,11 +51,13 @@ export default function AdminDashboard() {
     }
 
     async function fetchStats() {
-      const [customersRes, petsRes, appointmentsRes, servicesRes] = await Promise.all([
+      const [customersRes, petsRes, appointmentsRes, servicesRes, productsRes, groomersRes] = await Promise.all([
         supabase.from('profiles').select('id', { count: 'exact' }),
         supabase.from('pets').select('id', { count: 'exact' }),
         supabase.from('appointments').select('id', { count: 'exact' }),
         supabase.from('services').select('id', { count: 'exact' }),
+        supabase.from('products').select('id', { count: 'exact' }),
+        supabase.from('groomers').select('id', { count: 'exact' }),
       ]);
 
       setStats({
@@ -59,6 +65,8 @@ export default function AdminDashboard() {
         petCount: petsRes.count || 0,
         appointmentCount: appointmentsRes.count || 0,
         serviceCount: servicesRes.count || 0,
+        productCount: productsRes.count || 0,
+        groomerCount: groomersRes.count || 0,
       });
       setIsLoading(false);
     }
@@ -93,8 +101,8 @@ export default function AdminDashboard() {
     { label: 'Pets', value: stats.petCount, icon: PawPrint, href: '/admin/pets', color: 'text-accent bg-accent/10' },
     { label: 'Appointments', value: stats.appointmentCount, icon: Calendar, href: '/admin/appointments', color: 'text-warning bg-warning/10' },
     { label: 'Services', value: stats.serviceCount, icon: Scissors, href: '/admin/services', color: 'text-success bg-success/10' },
-    { label: 'Products', value: 0, icon: Package, href: '/admin/products', color: 'text-primary bg-primary/10' },
-    { label: 'Groomers', value: 0, icon: UserCheck, href: '/admin/groomers', color: 'text-accent bg-accent/10' },
+    { label: 'Products', value: stats.productCount, icon: Package, href: '/admin/products', color: 'text-primary bg-primary/10' },
+    { label: 'Groomers', value: stats.groomerCount, icon: UserCheck, href: '/admin/groomers', color: 'text-accent bg-accent/10' },
     { label: 'Analytics', value: null, icon: BarChart3, href: '/admin/analytics', color: 'text-success bg-success/10' },
   ];
 
@@ -129,7 +137,7 @@ export default function AdminDashboard() {
 
         {/* Quick Actions */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Button variant="default" size="lg" className="h-auto py-6" asChild>
+          <Button variant="outline" size="lg" className="h-auto py-6" asChild>
             <Link to="/admin/customers" className="flex flex-col items-center gap-2">
               <Users className="h-6 w-6" />
               <span>Manage Customers</span>

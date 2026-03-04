@@ -203,8 +203,8 @@ export default function AdminPets() {
     <Layout>
       <div className="container py-8">
         <div className="mb-6">
-          <Button variant="ghost" size="sm" onClick={() => navigate('/admin')} className="mb-4">
-            <ChevronLeft className="mr-1 h-4 w-4" />
+          <Button variant="outline" size="sm" onClick={() => navigate('/admin')} className="mb-4">
+            <ChevronLeft className="mr-2 h-4 w-4" />
             Back to Admin
           </Button>
           <div className="flex items-center justify-between">
