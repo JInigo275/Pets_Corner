@@ -1,5 +1,9 @@
 LAHAT TO TERMINAL MGA BUSET
 
+Temp admin acc: (need kasi ma verify ung email)
+email - cabusaorinenathan@gmail.com
+pass - 123456
+
 ```sh
 # Step 1: Clone the repository using the project's Git URL.
 git clone https://github.com/Cynic-Dev/Pets_Corner

@@ -93,7 +93,7 @@ export default function Dashboard() {
     { label: 'My Pets', value: stats.petCount, icon: PawPrint, href: '/dashboard/pets', color: 'text-primary bg-primary/10' },
     { label: 'Upcoming', value: stats.upcomingAppointments, icon: Calendar, href: '/dashboard/appointments', color: 'text-accent bg-accent/10' },
     { label: 'Loyalty Points', value: stats.loyaltyPoints, icon: Star, href: '/dashboard/loyalty', color: 'text-warning bg-warning/10' },
-    { label: 'Total Spent', value: `$${stats.totalSpent.toFixed(0)}`, icon: CreditCard, href: '/dashboard/history', color: 'text-success bg-success/10' },
+    { label: 'Total Spent', value: `P${stats.totalSpent}`, icon: CreditCard, href: '/dashboard/history', color: 'text-success bg-success/10' },
   ];
 
   return (

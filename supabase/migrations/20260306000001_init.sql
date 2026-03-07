@@ -64,6 +64,22 @@ CREATE TABLE public.user_roles (
   UNIQUE (user_id, role)
 );
 
+-- Create security definer function to check roles (defined after user_roles table)
+CREATE OR REPLACE FUNCTION public.has_role(_user_id UUID, _role app_role)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.user_roles
+    WHERE user_id = _user_id
+      AND role = _role
+  )
+$$;
+
 -- Create pets table
 CREATE TABLE public.pets (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -217,22 +233,6 @@ ALTER TABLE public.appointments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.service_history ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.admin_audit_log ENABLE ROW LEVEL SECURITY;
 
--- Create security definer function to check roles
-CREATE OR REPLACE FUNCTION public.has_role(_user_id UUID, _role app_role)
-RETURNS BOOLEAN
-LANGUAGE sql
-STABLE
-SECURITY DEFINER
-SET search_path = public
-AS $$
-  SELECT EXISTS (
-    SELECT 1
-    FROM public.user_roles
-    WHERE user_id = _user_id
-      AND role = _role
-  )
-$$;
-
 -- Create function to update timestamps
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -305,19 +305,3 @@ CREATE POLICY "Admins can manage all history" ON public.service_history FOR ALL 
 -- RLS Policies for admin_audit_log
 CREATE POLICY "Admins can view audit logs" ON public.admin_audit_log FOR SELECT USING (public.has_role(auth.uid(), 'admin'));
 CREATE POLICY "Admins can insert audit logs" ON public.admin_audit_log FOR INSERT WITH CHECK (public.has_role(auth.uid(), 'admin'));
-
--- Insert default services
-INSERT INTO public.services (name, description, category, price_min, price_max, duration_minutes) VALUES
-('Basic Grooming', 'Bath, Nails, Paw, Ear, Trim, and Blow Dry', 'grooming', 400.00, 700.00, 360),
-('Full Grooming', 'Bath, Nails, Paw, Ear, Trim, Draining, Haircut, Cologne, Blow Dry, and One Chosen Treatment', 'grooming', 500.00, 900.00, 360),
-('Nail Trim', 'Nail clipping and filing', 'grooming', 100.00, 100.00, 15),
-('Teeth Cleaning', 'Professional dental cleaning', 'grooming', 150.00, 150.00, 30),
-('Face Trim', 'Light trimming to look clean and neat', 'grooming', 100.00, 100.00, 60)
-('Ear Cleaning', 'Ear canal cleaning', 'grooming', 100.00, 100.00, 60)
-('Anal Sac Drain', 'Relieve pressure and discomfort on the anal glands', 'grooming', 150.00, 150.00, 30),
-('Pet Boarding', '3 or more comfy days of stay including meals and FREE bath', 'boarding', 400.00, 600.00, 4320),
-
--- Insert default groomers
-INSERT INTO public.groomers (name, specialty) VALUES
-('Jocel', 'Groomer'),
-('Kenny', 'Groomer'),

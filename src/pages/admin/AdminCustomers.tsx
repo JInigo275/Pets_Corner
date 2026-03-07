@@ -241,8 +241,8 @@ export default function AdminCustomers() {
       await supabase.from('service_history').delete().eq('customer_id', customer.user_id);
       // delete user roles
       await supabase.from('user_roles').delete().eq('user_id', customer.user_id);
-      // delete profile
-      const { error } = await supabase.from('profiles').delete().eq('id', customer.id);
+      // delete profile - must use user_id, not profile's id
+      const { error } = await supabase.from('profiles').delete().eq('user_id', customer.user_id);
 
       if (error) {
         toast.error('Failed to delete customer');
