@@ -305,3 +305,88 @@ CREATE POLICY "Admins can manage all history" ON public.service_history FOR ALL 
 -- RLS Policies for admin_audit_log
 CREATE POLICY "Admins can view audit logs" ON public.admin_audit_log FOR SELECT USING (public.has_role(auth.uid(), 'admin'));
 CREATE POLICY "Admins can insert audit logs" ON public.admin_audit_log FOR INSERT WITH CHECK (public.has_role(auth.uid(), 'admin'));
+
+
+CREATE OR REPLACE FUNCTION public.handle_appointment_completed()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+BEGIN
+  -- Only trigger when status changes to 'completed'
+  IF NEW.status = 'completed' AND (OLD.status IS DISTINCT FROM 'completed') THEN
+    -- Insert into service_history
+    INSERT INTO public.service_history (customer_id, pet_id, appointment_id, service_name, service_date, amount_paid, loyalty_points_earned)
+    SELECT
+      NEW.customer_id,
+      NEW.pet_id,
+      NEW.id,
+      COALESCE(s.name, 'Unknown Service'),
+      NEW.appointment_date,
+      COALESCE(NEW.total_price, 0),
+      10
+    FROM public.services s
+    WHERE s.id = NEW.service_id;
+
+    -- If no service found, still insert with defaults
+    IF NOT FOUND THEN
+      INSERT INTO public.service_history (customer_id, pet_id, appointment_id, service_name, service_date, amount_paid, loyalty_points_earned)
+      VALUES (NEW.customer_id, NEW.pet_id, NEW.id, 'Service', NEW.appointment_date, COALESCE(NEW.total_price, 0), 10);
+    END IF;
+
+    -- Add 10 loyalty points to the customer's profile
+    UPDATE public.profiles
+    SET loyalty_points = COALESCE(loyalty_points, 0) + 10
+    WHERE user_id = NEW.customer_id;
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER on_appointment_completed
+  AFTER UPDATE ON public.appointments
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_appointment_completed();
+
+-- Add missing DELETE policy for profiles table so admins can delete customers
+
+-- Allow admins to delete all profiles
+CREATE POLICY "Admins can delete all profiles"
+  ON public.profiles FOR DELETE
+  TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'));
+
+-- Add admin policy for uploading groomer photos to pet-photos bucket
+
+-- Allow admins to upload groomer photos
+CREATE POLICY "Admins can upload groomer photos"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'pet-photos'
+  AND (storage.foldername(name))[1] = 'groomers'
+  AND public.has_role(auth.uid(), 'admin'::public.app_role)
+);
+
+-- Allow admins to update groomer photos
+CREATE POLICY "Admins can update groomer photos"
+ON storage.objects FOR UPDATE
+TO authenticated
+USING (
+  bucket_id = 'pet-photos'
+  AND (storage.foldername(name))[1] = 'groomers'
+  AND public.has_role(auth.uid(), 'admin'::public.app_role)
+);
+
+-- Allow admins to delete groomer photos
+CREATE POLICY "Admins can delete groomer photos"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (
+  bucket_id = 'pet-photos'
+  AND (storage.foldername(name))[1] = 'groomers'
+  AND public.has_role(auth.uid(), 'admin'::public.app_role)
+);
+
