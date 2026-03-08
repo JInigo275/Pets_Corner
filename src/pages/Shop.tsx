@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, ShoppingBag, Package } from 'lucide-react';
+import { Loader2, ShoppingBag, Package, Search } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
 
 interface Product {
   id: string;
@@ -16,6 +17,7 @@ interface Product {
 export default function Shop() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     async function fetchProducts() {
@@ -30,7 +32,18 @@ export default function Shop() {
     fetchProducts();
   }, []);
 
-  const categories = [...new Set(products.map((p) => p.category))];
+  const filtered = useMemo(() => {
+    if (!search.trim()) return products;
+    const q = search.toLowerCase();
+    return products.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.description?.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q)
+    );
+  }, [products, search]);
+
+  const categories = [...new Set(filtered.map((p) => p.category))];
 
   if (isLoading) {
     return (
@@ -55,7 +68,17 @@ export default function Shop() {
           </p>
         </div>
 
-        {products.length === 0 ? (
+        <div className="relative mx-auto mb-8 max-w-md">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search products..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+
+        {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <Package className="mb-4 h-12 w-12 text-muted-foreground/50" />
             <p className="text-lg font-medium text-muted-foreground">No products available yet</p>
@@ -74,7 +97,7 @@ export default function Shop() {
             {categories.map((category) => (
               <TabsContent key={category} value={category}>
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {products
+                  {filtered
                     .filter((p) => p.category === category)
                     .map((product) => (
                       <div
