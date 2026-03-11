@@ -287,7 +287,7 @@ export type Database = {
           category: string
           created_at: string
           description: string | null
-          duration_minutes: number
+          duration_minutes: number | null
           id: string
           is_active: boolean | null
           name: string
@@ -299,7 +299,7 @@ export type Database = {
           category: string
           created_at?: string
           description?: string | null
-          duration_minutes: number
+          duration_minutes?: number | null
           id?: string
           is_active?: boolean | null
           name: string
@@ -311,7 +311,7 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string | null
-          duration_minutes?: number
+          duration_minutes?: number | null
           id?: string
           is_active?: boolean | null
           name?: string
