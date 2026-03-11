@@ -20,7 +20,7 @@ interface Service {
   category: string;
   price_min: number;
   price_max: number;
-  duration_minutes: number;
+  duration_minutes: number | null;
   is_active: boolean;
 }
 
@@ -77,7 +77,7 @@ export default function AdminServices() {
       category: service.category,
       price_min: service.price_min.toString(),
       price_max: service.price_max.toString(),
-      duration_minutes: service.duration_minutes.toString(),
+      duration_minutes: service.duration_minutes ? service.duration_minutes.toString() : '',
       is_active: service.is_active,
     });
     setIsDialogOpen(true);
@@ -93,7 +93,7 @@ export default function AdminServices() {
       category: formData.category,
       price_min: parseFloat(formData.price_min),
       price_max: parseFloat(formData.price_max),
-      duration_minutes: parseInt(formData.duration_minutes),
+      duration_minutes: formData.duration_minutes ? parseInt(formData.duration_minutes) : null,
       is_active: formData.is_active,
     };
 
@@ -209,12 +209,11 @@ export default function AdminServices() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label>Duration (minutes) *</Label>
+                    <Label>Duration (minutes)</Label>
                     <Input
                       type="number"
                       value={formData.duration_minutes}
                       onChange={(e) => setFormData({ ...formData, duration_minutes: e.target.value })}
-                      required
                     />
                   </div>
                   <div className="space-y-2">
@@ -275,7 +274,9 @@ export default function AdminServices() {
                 <span className="font-semibold text-primary">
                   P{service.price_min} - P{service.price_max}
                 </span>
-                <span className="text-muted-foreground">{service.duration_minutes} min</span>
+                {service.duration_minutes ? (
+                  <span className="text-muted-foreground">{service.duration_minutes} min</span>
+                ) : null}
               </div>
             </div>
           ))}

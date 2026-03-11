@@ -27,7 +27,7 @@ interface Service {
   category: string;
   price_min: number;
   price_max: number;
-  duration_minutes: number;
+  duration_minutes: number | null;
 }
 
 interface Groomer {

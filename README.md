@@ -20,7 +20,7 @@ Commiting to github:
 git init
 
 # Step 2:
-git checkout "<branch-name>"
+git checkout -b "<branch-name>"
 
 # Step 3:
 git add .
@@ -58,3 +58,4 @@ npm run dev
 Under "Network" copy link into mobile browser
 
 ```
+

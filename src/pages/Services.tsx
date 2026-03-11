@@ -13,7 +13,7 @@ interface Service {
   category: string;
   price_min: number;
   price_max: number;
-  duration_minutes: number;
+  duration_minutes: number | null;
 }
 
 export default function Services() {
@@ -56,10 +56,12 @@ export default function Services() {
             <Home className="h-6 w-6" />
           )}
         </div>
-        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-          <Clock className="h-4 w-4" />
-          {formatDuration(service.duration_minutes)}
-        </div>
+        {service.duration_minutes ? (
+          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+            <Clock className="h-4 w-4" />
+            {formatDuration(service.duration_minutes)}
+          </div>
+        ) : null}
       </div>
       <h3 className="mb-2 font-display text-lg font-bold">{service.name}</h3>
       <p className="mb-4 text-sm text-muted-foreground">{service.description}</p>

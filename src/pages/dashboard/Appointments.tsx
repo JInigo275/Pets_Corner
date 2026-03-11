@@ -18,7 +18,7 @@ interface Appointment {
   total_price: number | null;
   notes: string | null;
   pets: { name: string; species: string } | null;
-  services: { name: string; duration_minutes: number } | null;
+  services: { name: string; duration_minutes: number | null } | null;
   groomers: { name: string } | null;
 }
 

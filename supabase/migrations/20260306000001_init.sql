@@ -439,3 +439,5 @@ AS $$
     15
   );
 $$;
+
+ALTER TABLE public.services ALTER COLUMN duration_minutes DROP NOT NULL;
