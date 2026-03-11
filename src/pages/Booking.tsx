@@ -57,6 +57,8 @@ export default function Booking() {
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState('');
   const [notes, setNotes] = useState('');
+  const [dayFull, setDayFull] = useState(false);
+  const [checkingAvailability, setCheckingAvailability] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -82,9 +84,30 @@ export default function Booking() {
     if (user) fetchData();
   }, [user, authLoading, navigate]);
 
+  // Check daily availability when date changes
+  useEffect(() => {
+    if (!selectedDate) {
+      setDayFull(false);
+      return;
+    }
+    async function checkAvailability() {
+      setCheckingAvailability(true);
+      const dateStr = format(selectedDate!, 'yyyy-MM-dd');
+      const [countRes, limitRes] = await Promise.all([
+        supabase.rpc('get_daily_appointment_count', { _date: dateStr }),
+        supabase.rpc('get_daily_appointment_limit', { _date: dateStr }),
+      ]);
+      const count = countRes.data ?? 0;
+      const limit = limitRes.data ?? 15;
+      setDayFull(count >= limit);
+      setCheckingAvailability(false);
+    }
+    checkAvailability();
+  }, [selectedDate]);
+
   const selectedServiceData = services.find(s => s.id === selectedService);
   const estimatedPrice = selectedServiceData
-    ? `P${selectedServiceData.price_min.toFixed(0)} - P${selectedServiceData.price_max.toFixed(0)}`
+    ? `₱${selectedServiceData.price_min.toFixed(0)} - ₱${selectedServiceData.price_max.toFixed(0)}`
     : null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -94,6 +117,10 @@ export default function Booking() {
       toast.error('Please fill in all required fields');
       return;
     }
+    if (dayFull) {
+      toast.error('This date is fully booked. Please choose another date.');
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -101,7 +128,7 @@ export default function Booking() {
       customer_id: user.id,
       pet_id: selectedPet,
       service_id: selectedService,
-      groomer_id: selectedGroomer || null,
+      groomer_id: selectedGroomer && selectedGroomer !== 'any' ? selectedGroomer : null,
       service_type: serviceType,
       appointment_date: format(selectedDate, 'yyyy-MM-dd'),
       start_time: selectedTime,
@@ -173,7 +200,7 @@ export default function Booking() {
                 <SelectContent>
                   {services.map((service) => (
                     <SelectItem key={service.id} value={service.id}>
-                      {service.name} (P{service.price_min} - P{service.price_max})
+                      {service.name} (₱{service.price_min} - ₱{service.price_max})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -267,6 +294,16 @@ export default function Booking() {
                   />
                 </PopoverContent>
               </Popover>
+              {checkingAvailability && (
+                <p className="text-sm text-muted-foreground flex items-center gap-1">
+                  <Loader2 className="h-3 w-3 animate-spin" /> Checking availability...
+                </p>
+              )}
+              {dayFull && !checkingAvailability && (
+                <p className="text-sm text-destructive font-medium">
+                  This date is fully booked. Please select a different date.
+                </p>
+              )}
             </div>
 
             {/* Time Selection */}
@@ -304,7 +341,7 @@ export default function Booking() {
               variant="hero"
               size="lg"
               className="w-full"
-              disabled={isSubmitting}
+              disabled={isSubmitting || dayFull}
             >
               {isSubmitting ? (
                 <>

@@ -12,6 +12,7 @@ import {
   Package,
   UserCheck,
   BarChart3,
+  Settings,
   Loader2,
   ArrowRight,
   AlertCircle
@@ -56,8 +57,8 @@ export default function AdminDashboard() {
         supabase.from('pets').select('id', { count: 'exact' }),
         supabase.from('appointments').select('id', { count: 'exact' }),
         supabase.from('services').select('id', { count: 'exact' }),
-        supabase.from('products').select('id', { count: 'exact' }),
-        supabase.from('groomers').select('id', { count: 'exact' }),
+        supabase.from('products').select('id' , { count: 'exact'}),
+        supabase.from('groomers').select('id' , { count: 'exact'}),
       ]);
 
       setStats({
@@ -65,7 +66,7 @@ export default function AdminDashboard() {
         petCount: petsRes.count || 0,
         appointmentCount: appointmentsRes.count || 0,
         serviceCount: servicesRes.count || 0,
-        productCount: productsRes.count || 0,
+        productCount: productsRes.count || 0, 
         groomerCount: groomersRes.count || 0,
       });
       setIsLoading(false);
@@ -104,6 +105,7 @@ export default function AdminDashboard() {
     { label: 'Products', value: stats.productCount, icon: Package, href: '/admin/products', color: 'text-primary bg-primary/10' },
     { label: 'Groomers', value: stats.groomerCount, icon: UserCheck, href: '/admin/groomers', color: 'text-accent bg-accent/10' },
     { label: 'Analytics', value: null, icon: BarChart3, href: '/admin/analytics', color: 'text-success bg-success/10' },
+    { label: 'Settings', value: null, icon: Settings, href: '/admin/settings', color: 'text-warning bg-warning/10' },
   ];
 
   return (
@@ -137,7 +139,7 @@ export default function AdminDashboard() {
 
         {/* Quick Actions */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Button variant="outline" size="lg" className="h-auto py-6" asChild>
+          <Button variant="default" size="lg" className="h-auto py-6" asChild>
             <Link to="/admin/customers" className="flex flex-col items-center gap-2">
               <Users className="h-6 w-6" />
               <span>Manage Customers</span>
@@ -177,6 +179,12 @@ export default function AdminDashboard() {
             <Link to="/admin/analytics" className="flex flex-col items-center gap-2">
               <BarChart3 className="h-6 w-6" />
               <span>View Analytics</span>
+            </Link>
+          </Button>
+          <Button variant="outline" size="lg" className="h-auto py-6" asChild>
+            <Link to="/admin/settings" className="flex flex-col items-center gap-2">
+              <Settings className="h-6 w-6" />
+              <span>Appointment Settings</span>
             </Link>
           </Button>
         </div>

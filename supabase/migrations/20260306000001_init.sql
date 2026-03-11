@@ -390,3 +390,52 @@ USING (
   AND public.has_role(auth.uid(), 'admin'::public.app_role)
 );
 
+
+CREATE TABLE public.daily_appointment_limits (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  date date NOT NULL UNIQUE,
+  max_appointments integer NOT NULL DEFAULT 15,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.daily_appointment_limits ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Admins can manage daily limits"
+  ON public.daily_appointment_limits
+  FOR ALL
+  TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'));
+
+CREATE POLICY "Anyone can view daily limits"
+  ON public.daily_appointment_limits
+  FOR SELECT
+  TO public
+  USING (true);
+
+-- Function to check if a date is fully booked
+CREATE OR REPLACE FUNCTION public.get_daily_appointment_count(_date date)
+RETURNS integer
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+  SELECT COUNT(*)::integer
+  FROM public.appointments
+  WHERE appointment_date = _date
+    AND status NOT IN ('cancelled');
+$$;
+
+CREATE OR REPLACE FUNCTION public.get_daily_appointment_limit(_date date)
+RETURNS integer
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+  SELECT COALESCE(
+    (SELECT max_appointments FROM public.daily_appointment_limits WHERE date = _date),
+    15
+  );
+$$;
