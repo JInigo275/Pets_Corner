@@ -20,7 +20,7 @@ export function Footer() {
               Pets Corner
             </Link>
             <p className="text-sm text-muted-foreground">
-              Premium pet grooming and boarding services. Your pet's happiness is our priority.
+              At our shop, we treat your pets like our own — with grooming, boarding, and all the supplies they need to live happy and healthy lives.
             </p>
           </div>
 

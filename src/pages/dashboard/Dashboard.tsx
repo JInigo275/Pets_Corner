@@ -93,7 +93,7 @@ export default function Dashboard() {
     { label: 'My Pets', value: stats.petCount, icon: PawPrint, href: '/dashboard/pets', color: 'text-primary bg-primary/10' },
     { label: 'Upcoming', value: stats.upcomingAppointments, icon: Calendar, href: '/dashboard/appointments', color: 'text-accent bg-accent/10' },
     { label: 'Loyalty Points', value: stats.loyaltyPoints, icon: Star, href: '/dashboard/loyalty', color: 'text-warning bg-warning/10' },
-    { label: 'Total Spent', value: `P${stats.totalSpent}`, icon: CreditCard, href: '/dashboard/history', color: 'text-success bg-success/10' },
+    { label: 'Total Spent', value: `₱${stats.totalSpent}`, icon: CreditCard, href: '/dashboard/history', color: 'text-success bg-success/10' },
   ];
 
   return (
@@ -102,7 +102,7 @@ export default function Dashboard() {
         {/* Welcome Header */}
         <div className="mb-8">
           <h1 className="mb-2 font-display text-3xl font-bold">
-            Welcome back, {profile?.full_name?.split(' ')[0] || 'there'}! 👋
+            Welcome back, {profile?.full_name?.split(' ')[0] || 'there'}! 👋🏻
           </h1>
           <p className="text-muted-foreground">
             Here's an overview of your pet care activities
