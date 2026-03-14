@@ -48,7 +48,8 @@ export default function ResetPassword() {
     });
 
     if (error) {
-      toast.error(error.message);
+      const friendlyMsg = error.message.toLowerCase().includes('rate') ? 'Rate limit exceeded. Please wait before trying again.' : error.message;
+      toast.error(friendlyMsg);
     } else {
       setIsSuccess(true);
       toast.success('Password updated successfully!');
