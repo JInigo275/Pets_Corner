@@ -22,7 +22,10 @@ export default function ForgotPassword() {
     });
 
     if (error) {
-      toast.error(error.message);
+      const friendlyMsg = error.message.toLowerCase().includes('rate') && error.message.toLowerCase().includes('exceed') 
+        ? 'Email rate limit exceeded (1000/hour). Please wait 1 hour before requesting another reset link.'
+        : error.message;
+      toast.error(friendlyMsg);
     } else {
       setEmailSent(true);
       toast.success('Password reset email sent!');

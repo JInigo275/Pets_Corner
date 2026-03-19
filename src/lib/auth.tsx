@@ -18,7 +18,7 @@ interface AuthContextType {
   profile: Profile | null;
   isAdmin: boolean;
   isLoading: boolean;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, fullName: string, phone?: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -85,23 +85,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string) => {
+  const signUp = async (email: string, password: string, fullName: string, phone?: string) => {
     try {
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: window.location.origin,
-          data: { full_name: fullName }
+          data: { full_name: fullName, ...(phone && { phone }) }
         }
       });
       if (error) {
         console.error('Sign up error:', error);
+        const friendlyError = getFriendlyError(error.message);
+        return { error: new Error(friendlyError) };
       }
-      return { error };
+      return { error: null };
     } catch (err) {
       console.error('Sign up exception:', err);
-      return { error: err as Error };
+      const friendlyError = getFriendlyError((err as Error).message);
+      return { error: new Error(friendlyError) };
     }
   };
 
@@ -110,11 +113,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         console.error('Sign in error:', error);
+        const friendlyError = getFriendlyError(error.message);
+        return { error: new Error(friendlyError) };
       }
-      return { error };
+      return { error: null };
     } catch (err) {
       console.error('Sign in exception:', err);
-      return { error: err as Error };
+      const friendlyError = getFriendlyError((err as Error).message);
+      return { error: new Error(friendlyError) };
     }
   };
 
@@ -124,6 +130,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(null);
     setProfile(null);
     setIsAdmin(false);
+  };
+
+  const getFriendlyError = (message: string): string => {
+    const lowerMsg = message.toLowerCase();
+    if (lowerMsg.includes('rate') && lowerMsg.includes('exceed')) {
+      return 'Email rate limit exceeded (1000/hour). Please wait 1 hour before trying again or contact support.';
+    }
+    if (lowerMsg.includes('too many requests') || lowerMsg.includes('limit')) {
+      return 'Too many requests (1000 emails/hour). Please wait before trying again.';
+    }
+    if (lowerMsg.includes('email')) {
+      return 'There was an issue with your email. Please check and try again.';
+    }
+    if (lowerMsg.includes('password')) {
+      return 'Invalid password. Please try again.';
+    }
+    return message;
   };
 
   return (

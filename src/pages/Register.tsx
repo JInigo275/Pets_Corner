@@ -5,12 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Layout } from '@/components/layout/Layout';
-import { PawPrint, Loader2, Eye, EyeOff } from 'lucide-react';
+import { PawPrint, Loader2, Eye, EyeOff, Phone } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Register() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false);
@@ -25,9 +26,11 @@ export default function Register() {
       return;
     }
 
+
+
     setIsLoading(true);
 
-    const { error } = await signUp(email, password, fullName);
+    const { error } = await signUp(email, password, fullName, phone);
     
     if (error) {
       toast.error(error.message);
@@ -77,6 +80,23 @@ export default function Register() {
                   required
                   className="h-11"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  Phone Number (PH)
+                </Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="+63 917 123 4567"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  required
+                  className="h-11"
+                />
+                <p className="text-xs text-muted-foreground">Philippine mobile number starting with +63 9</p>
               </div>
 
               <div className="space-y-2">
